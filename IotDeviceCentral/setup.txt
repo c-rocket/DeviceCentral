@@ -1,0 +1,37 @@
+Maven Setup for Oracle Jar
+
+mvn deploy:deploy-file -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.1 -Dpackaging=jar -Dfile="C:/Development/libraries/Oracle DB Driver/ojdbc7.jar" -DrepositoryId=IotDeviceCentral -Durl=https://developer.us2.oraclecloud.com/profile/developer81684-metcsgse00209/s/developer81684-metcsgse00209_iotdevicecentral/maven/ -DgeneratePom=true
+
+
+Create User in DB
+
+CREATE USER c##device IDENTIFIED BY iotdevice 
+DEFAULT TABLESPACE users
+QUOTA UNLIMITED ON users PASSWORD EXPIRE;
+CREATE ROLE c##iot_device_role;
+GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW to c##iot_device_role;
+GRANT c##iot_device_role TO c##device;
+
+ALTER PROFILE DEFAULT LIMIT
+FAILED_LOGIN_ATTEMPTS UNLIMITED
+PASSWORD_LIFE_TIME UNLIMITED;
+
+alter user c##device identified by iotdevice;
+
+Create Tables
+
+CREATE TABLE iot_device
+  (
+    id       NUMBER,
+    name     VARCHAR2(60),
+    filename VARCHAR2(60),
+    device BLOB,
+    picture BLOB
+  );
+  
+  CREATE SEQUENCE iot_device_seq
+  MINVALUE 1
+  MAXVALUE 999999999999999999999999999
+  START WITH 1
+  INCREMENT BY 1
+  CACHE 20;
