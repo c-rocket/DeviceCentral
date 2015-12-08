@@ -45,6 +45,26 @@ public class IotDeviceDaoTest {
 	}
 
 	@Test
+	public void updateDevice() throws Exception {
+		// setup
+		String name = "Sample";
+		InputStream deviceInputStream = this.getClass().getClassLoader()
+				.getResourceAsStream("deviceLoad/template.properties");
+		byte[] device = createFromStream(deviceInputStream);
+
+		InputStream pictureInputStream = this.getClass().getClassLoader().getResourceAsStream("deviceLoad/widget.png");
+		byte[] picture = createFromStream(pictureInputStream);
+
+		// execute
+		boolean created = dao.create(name, device, picture);
+		boolean updated = dao.updateDevice(name, device, picture);
+
+		// assert
+		assertTrue(created);
+		assertTrue(updated);
+	}
+
+	@Test
 	public void getDevice() throws Exception {
 		// setup
 		String name = "Sample";
@@ -73,6 +93,34 @@ public class IotDeviceDaoTest {
 		assertEquals(name, actualDevice.get("name"));
 		assertNotNull(actualDevice.get("device"));
 		assertNotNull(actualDevice.get("picture"));
+	}
+
+	@Test
+	public void deleteDevice() throws Exception {
+		// setup
+		String name = "Sample";
+		InputStream deviceInputStream = this.getClass().getClassLoader()
+				.getResourceAsStream("deviceLoad/template.properties");
+		byte[] device = createFromStream(deviceInputStream);
+
+		InputStream pictureInputStream = this.getClass().getClassLoader().getResourceAsStream("deviceLoad/widget.png");
+		byte[] picture = createFromStream(pictureInputStream);
+
+		// execute
+		boolean created = dao.create(name, device, picture);
+		List<String> names = dao.getAllDeviceNames();
+		dao.deleteByName(name);
+		List<String> names2 = dao.getAllDeviceNames();
+
+		// assert
+		assertTrue(created);
+		assertNotNull(names);
+		assertTrue(names.size() > 0);
+		assertTrue(names.contains("Sample"));
+
+		assertTrue(created);
+		assertNotNull(names2);
+		assertTrue(names2.size() == names.size() - 1);
 	}
 
 	private Map<String, Object> getDevice(List<Map<String, Object>> devices, String name) {
