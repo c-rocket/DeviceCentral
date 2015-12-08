@@ -1,5 +1,6 @@
 package com.oracle.iot.devicecentral.controller;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.oracle.iot.devicecentral.controller.bind.DeviceUpload;
 import com.oracle.iot.devicecentral.model.Response;
 import com.oracle.iot.devicecentral.model.Status;
 import com.oracle.iot.devicecentral.service.IoTDeviceService;
+import com.oracle.iot.devicecentral.util.FileUtils;
 
 @Controller
 public class DeviceController {
@@ -38,9 +39,9 @@ public class DeviceController {
 
 	@RequestMapping(value = "/device/save", method = RequestMethod.POST)
 	public @ResponseBody Map<String, Object> uploadDevicePost(@ModelAttribute("device") DeviceUpload device) {
-		MultipartFile propertyFile = device.getFiles().get(0);
-		MultipartFile imageFile = device.getFiles().get(1);
-		if (!propertyFile.isEmpty()) {
+		if (!device.getFiles().get(0).isEmpty()) {
+			File propertyFile = FileUtils.convert(device.getFiles().get(0));
+			File imageFile = FileUtils.convert(device.getFiles().get(1));
 			Status status = deviceService.save(device.getName(), propertyFile, imageFile);
 			return new Response(status).map();
 		} else {
