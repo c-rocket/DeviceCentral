@@ -13,11 +13,13 @@ import javax.annotation.Resource;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.oracle.iot.devicecentral.dao.IotDeviceDao;
 import com.oracle.iot.devicecentral.model.Status;
 
 @Service
+@Transactional
 public class IoTDeviceService {
 
 	private static Logger logger = Logger.getLogger(IoTDeviceService.class);
