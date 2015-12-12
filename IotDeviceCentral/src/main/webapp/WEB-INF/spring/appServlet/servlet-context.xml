@@ -34,8 +34,8 @@
 	<!-- <jee:jndi-lookup id="dataSource" jndi-name="jdbc/jpetstore"/> -->
 	<beans:bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource">
 		<beans:property name="URL"
-			value="jdbc:oracle:thin:@129.152.150.206:1521:ORCL" />
-		<beans:property name="user" value="c##device" />
+			value="jdbc:oracle:thin:@129.152.150.206:1521/PDB1.metcsgse00209.oraclecloud.internal" />
+		<beans:property name="user" value="device" />
 		<beans:property name="password" value="iotdevice" />
 	</beans:bean>
 
