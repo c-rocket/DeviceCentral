@@ -1,10 +1,7 @@
 package com.oracle.iot.devicecentral.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,21 +25,24 @@ public class IoTDeviceService {
 	IotDeviceDao dao;
 
 	public List<String> getAllDevices() {
-		return dao.getAllDeviceNames();
+		try {
+			return dao.getAllDeviceNames();
+		} catch (Exception e) {
+			logger.error("Can't pull up names", e);
+			return new ArrayList<String>();
+		}
 	}
 
-	public Status save(String name, File propertyFile, File imageFile) {
-		if (imageFile == null) {
+	public Status save(String name, String propertyFile, String imageFile) {
+		if (imageFile == null || imageFile.length() == 0) {
 			imageFile = loadDefaultWidget();
 		}
 		try {
-			byte[] deviceAr = IOUtils.toByteArray(new FileInputStream(propertyFile));
-			byte[] imageAr = IOUtils.toByteArray(new FileInputStream(imageFile));
 			if (dao.existsByName(name)) {
-				dao.updateDevice(name, deviceAr, imageAr);
+				dao.updateDevice(name, propertyFile, imageFile);
 				return Status.SUCCESS;
 			} else {
-				dao.create(name, deviceAr, imageAr);
+				dao.create(name, propertyFile, imageFile);
 				return Status.CREATED;
 			}
 		} catch (Exception e) {
@@ -51,24 +51,24 @@ public class IoTDeviceService {
 		}
 	}
 
-	private File loadDefaultWidget() {
+	private String loadDefaultWidget() {
 		try {
 			InputStream widgetStream = this.getClass().getClassLoader().getResourceAsStream("default/widget.png");
-			File file = File.createTempFile("widget", ".png");
-			OutputStream outputStream = new FileOutputStream(file);
-			IOUtils.copy(widgetStream, outputStream);
+			String str = IOUtils.toString(widgetStream);
 			widgetStream.close();
-			outputStream.close();
-			return file;
+			return str;
 		} catch (Exception e) {
 			logger.error("Error loading widget", e);
 			return null;
 		}
 	}
 
-	public List<Map<String, Object>> getDevicesFiles(List<String> names) {
-		List<Map<String, Object>> devices = dao.getDevicesByNames(names);
-		return devices;
+	public Map<String, Object> getDeviceFiles(String name) {
+		return dao.getDeviceByName(name);
+	}
+
+	public void deleteDeviceByName(String name) {
+		dao.deleteByName(name);
 	}
 
 }

@@ -5,23 +5,20 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public class DeviceUpload {
-	private String name;
+	private String deviceName;
+	private byte[] file;
 	private List<MultipartFile> files;
 
 	public List<MultipartFile> getFiles() {
 		return files;
 	}
 
-	public void setFiles(List<MultipartFile> files) {
-		this.files = files;
+	public String getDeviceName() {
+		return deviceName;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setDeviceName(String name) {
+		this.deviceName = name;
 	}
 
 }
