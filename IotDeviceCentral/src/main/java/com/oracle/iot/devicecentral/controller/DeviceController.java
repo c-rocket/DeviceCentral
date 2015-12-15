@@ -22,7 +22,7 @@ public class DeviceController {
 	IoTDeviceService deviceService;
 
 	@RequestMapping(value = "/devices/list", method = RequestMethod.GET)
-	public @ResponseBody List<String> setupPage() {
+	public @ResponseBody List<Map<String, Object>> setupPage() {
 		return deviceService.getAllDevices();
 	}
 
@@ -34,10 +34,11 @@ public class DeviceController {
 	@RequestMapping(value = "/device/save", method = RequestMethod.POST)
 	public @ResponseBody Map<String, Object> uploadDevicePost(
 			@RequestParam(required = false, name = "deviceName") String deviceName,
+			@RequestParam(required = false, name = "industry") String industry,
 			@RequestParam(required = false, name = "deviceFile") String deviceFile,
 			@RequestParam(required = false, name = "imageFile") String imageFile) {
 		if (deviceName != null && deviceFile != null) {
-			Status status = deviceService.save(deviceName, deviceFile, imageFile);
+			Status status = deviceService.save(deviceName, industry, deviceFile, imageFile);
 			return new Response(status).map();
 		} else {
 			return new Response(Status.BAD_PARAMS).map();

@@ -24,25 +24,25 @@ public class IoTDeviceService {
 	@Resource
 	IotDeviceDao dao;
 
-	public List<String> getAllDevices() {
+	public List<Map<String, Object>> getAllDevices() {
 		try {
 			return dao.getAllDeviceNames();
 		} catch (Exception e) {
 			logger.error("Can't pull up names", e);
-			return new ArrayList<String>();
+			return new ArrayList<Map<String, Object>>();
 		}
 	}
 
-	public Status save(String name, String propertyFile, String imageFile) {
+	public Status save(String name, String industry, String propertyFile, String imageFile) {
 		if (imageFile == null || imageFile.length() == 0) {
 			imageFile = loadDefaultWidget();
 		}
 		try {
 			if (dao.existsByName(name)) {
-				dao.updateDevice(name, propertyFile, imageFile);
+				dao.updateDevice(name, industry, propertyFile, imageFile);
 				return Status.SUCCESS;
 			} else {
-				dao.create(name, propertyFile, imageFile);
+				dao.create(name, industry, propertyFile, imageFile);
 				return Status.CREATED;
 			}
 		} catch (Exception e) {
@@ -64,7 +64,9 @@ public class IoTDeviceService {
 	}
 
 	public Map<String, Object> getDeviceFiles(String name) {
-		return dao.getDeviceByName(name);
+		Map<String, Object> device = dao.getDeviceByName(name);
+		dao.incrementDownloadCount(name);
+		return device;
 	}
 
 	public void deleteDeviceByName(String name) {

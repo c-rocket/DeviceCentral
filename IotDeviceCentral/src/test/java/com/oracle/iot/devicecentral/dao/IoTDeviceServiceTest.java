@@ -1,10 +1,11 @@
 package com.oracle.iot.devicecentral.dao;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,48 +27,57 @@ public class IoTDeviceServiceTest {
 	@Test
 	public void getAllDevices() throws Exception {
 		// setup
-		List<String> names = Arrays.asList("Test", "Names", "Here");
+		List<Map<String, Object>> names = Arrays.asList(createMapItem("Test"), createMapItem("Names"),
+				createMapItem("Here"));
 		Mockito.when(dao.getAllDeviceNames()).thenReturn(names);
 
 		// execute
-		List<String> allDevices = service.getAllDevices();
+		List<Map<String, Object>> allDevices = service.getAllDevices();
 
 		// assert
 		assertEquals(names.size(), allDevices.size());
-		assertTrue(allDevices.contains("Test"));
-		assertTrue(allDevices.contains("Names"));
-		assertTrue(allDevices.contains("Here"));
+		assertEquals(allDevices.get(0).get("NAME"), "Test");
+		assertEquals(allDevices.get(1).get("NAME"), "Names");
+		assertEquals(allDevices.get(2).get("NAME"), "Here");
+	}
+
+	private Map<String, Object> createMapItem(String string) {
+		Map<String, Object> map = new LinkedHashMap<>();
+		map.put("NAME", string);
+		return map;
 	}
 
 	@Test
 	public void save_nameExists() throws Exception {
 		// setup
 		String name = "test";
+		String industry = "General";
 		String propertyFile = "propertyFile";
 		String imageFile = "imageFile";
 		Mockito.when(dao.existsByName(name)).thenReturn(true);
 
 		// execute
-		service.save(name, propertyFile, imageFile);
+		service.save(name, industry, propertyFile, imageFile);
 
 		// assert
-		Mockito.verify(dao, Mockito.times(1)).updateDevice(name, propertyFile, imageFile);
-		Mockito.verify(dao, Mockito.never()).create(name, propertyFile, imageFile);
+		Mockito.verify(dao, Mockito.times(1)).updateDevice(name, industry, propertyFile, imageFile);
+		Mockito.verify(dao, Mockito.never()).create(name, industry, propertyFile, imageFile);
 	}
 
 	@Test
 	public void save_nameDoesNotExist() throws Exception {
 		// setup
 		String name = "test";
+		String industry = "General";
 		String propertyFile = "propertyFile";
 		String imageFile = "imageFile";
 		Mockito.when(dao.existsByName(name)).thenReturn(false);
 
 		// execute
-		service.save(name, propertyFile, imageFile);
+		service.save(name, industry, propertyFile, imageFile);
 
 		// assert
-		Mockito.verify(dao, Mockito.never()).updateDevice(name, propertyFile, imageFile);
-		Mockito.verify(dao, Mockito.times(1)).create(name, propertyFile, imageFile);
+		Mockito.verify(dao, Mockito.never()).updateDevice(name, industry, propertyFile, imageFile);
+		Mockito.verify(dao, Mockito.times(1)).create(name, industry, propertyFile, imageFile);
 	}
 }

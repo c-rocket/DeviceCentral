@@ -1,7 +1,5 @@
 package com.oracle.iot.devicecentral.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +8,6 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -24,14 +21,9 @@ public class IotDeviceDao {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	public List<String> getAllDeviceNames() {
-		String sql = "SELECT NAME as name FROM iot_device ORDER BY NAME DESC";
-		return jdbcTemplate.query(sql, new RowMapper<String>() {
-			@Override
-			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return rs.getString("name");
-			}
-		});
+	public List<Map<String, Object>> getAllDeviceNames() {
+		String sql = "SELECT NAME, INDUSTRY, RATING/DECODE(RATING_COUNT,0,1,RATING_COUNT) AS RATING, DOWNLOAD_COUNT FROM iot_device ORDER BY NAME DESC";
+		return jdbcTemplate.queryForList(sql);
 	}
 
 	public boolean existsByName(String name) {
@@ -40,22 +32,34 @@ public class IotDeviceDao {
 		return devices.size() > 0;
 	}
 
-	public boolean updateDevice(String name, String propertyFile, String imageFile) {
-		String sql = "UPDATE IOT_DEVICE SET device=?, picture=? WHERE name=?";
-		int updated = jdbcTemplate.update(sql, propertyFile, imageFile, name);
+	public boolean updateDevice(String name, String industry, String propertyFile, String imageFile) {
+		String sql = "UPDATE IOT_DEVICE SET device=?, picture=?, industry=? WHERE name=?";
+		int updated = jdbcTemplate.update(sql, propertyFile, imageFile, industry, name);
 		return updated != 0;
 	}
 
-	public boolean create(String name, String propertyFile, String imageFile) {
-		String sql = "INSERT INTO IOT_DEVICE (ID,name,device,picture) VALUES (iot_device_seq.nextval,?,?,?)";
-		int created = jdbcTemplate.update(sql, name, propertyFile, imageFile);
+	public boolean create(String name, String industry, String propertyFile, String imageFile) {
+		String sql = "INSERT INTO IOT_DEVICE (ID,name,industry,device,picture) VALUES (iot_device_seq.nextval,?,?,?,?)";
+		int created = jdbcTemplate.update(sql, name, industry, propertyFile, imageFile);
 		return created != 0;
 	}
 
 	public Map<String, Object> getDeviceByName(String name) {
-		String sql = "SELECT NAME as name, DEVICE as device, PICTURE as picture FROM IOT_DEVICE WHERE name = ?";
+		String sql = "SELECT NAME, INDUSTRY, DOWNLOAD_COUNT, RATING/DECODE(RATING_COUNT,0,1,RATING_COUNT) as RATING, DEVICE, PICTURE FROM IOT_DEVICE WHERE name = ?";
 		Map<String, Object> device = jdbcTemplate.queryForMap(sql, name);
 		return device;
+	}
+
+	public boolean incrementDownloadCount(String name) {
+		String sql = "UPDATE IOT_DEVICE SET download_count=(SELECT download_count+1 FROM IOT_DEVICE WHERE name=?) WHERE name=?";
+		int updated = jdbcTemplate.update(sql, name, name);
+		return updated != 0;
+	}
+
+	public boolean addRating(String name, int rating) {
+		String sql = "UPDATE IOT_DEVICE SET rating=(SELECT rating+? FROM IOT_DEVICE WHERE name=?), rating_count=(SELECT rating_count+1 FROM IOT_DEVICE WHERE name=?) WHERE name=?";
+		int updated = jdbcTemplate.update(sql, rating, name, name, name);
+		return updated != 0;
 	}
 
 	public boolean deleteByName(String name) {
