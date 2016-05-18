@@ -17,9 +17,9 @@
 
 	<repositories>
 		<repository>
-			<id>IotDeviceCentral</id>
-			<name>Iot Device Central</name>
-			<url>https://developer.us2.oraclecloud.com/profile/developer81684-metcsgse00209/s/developer81684-metcsgse00209_iotdevicecentral/maven/</url>
+			<id>IotDeviceSimulator</id>
+			<name>Iot Device Simulator</name>
+			<url>https://developer.us2.oraclecloud.com/profile/developer81684-metcsgse00209/s/developer81684-metcsgse00209_iotdevicesimulator/maven/</url>
 		</repository>
 	</repositories>
 
