@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ public class IotDeviceDaoTest {
 	public void saveDevice() throws Exception {
 		// setup
 		String name = "zzSample";
-		String industry = "Oil and Gas";
+		String industry = "Consumer Services";
 		InputStream deviceInputStream = this.getClass().getClassLoader()
 				.getResourceAsStream("deviceLoad/template.properties");
 		String device = createFromStream(deviceInputStream);

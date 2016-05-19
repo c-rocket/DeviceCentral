@@ -21,8 +21,13 @@ public class DeviceController {
 	@Resource
 	IoTDeviceService deviceService;
 
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public @ResponseBody List<Map<String, Object>> defaultHome() {
+		return deviceService.getAllDevices();
+	}
+	
 	@RequestMapping(value = "/devices/list", method = RequestMethod.GET)
-	public @ResponseBody List<Map<String, Object>> setupPage() {
+	public @ResponseBody List<Map<String, Object>> listDevices() {
 		return deviceService.getAllDevices();
 	}
 
